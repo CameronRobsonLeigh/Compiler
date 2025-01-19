@@ -1,4 +1,6 @@
 Compiler Breakdown: How to Build and Execute a Compiler
+
+
 Overview:
 In this guide, we break down the steps of compiling, assembling, linking, and executing a simple program, from source code to an executable. Tools such as C++, LLVM, GCC, NASM, and GNU Linkers play key roles in this process.
 
@@ -37,3 +39,30 @@ Use NASM to convert assembly code into machine code for a specific architecture 
 Handle low-level details like register manipulation and system calls.
 3. Execution
 Link the object file into an executable or run the generated machine code directly.
+
+
+
+Commands to run from front-back end
+
+1. g++ compiler.cpp -o compiler
+
+2. ./compiler
+
+3. nasm -f elf64 -o program.o program.s
+
+4. ld -o program program.o (this is a step in the process where the object file generated from the assembler is combined into an executable file named program).
+
+5. ./program
+
+6. echo $?
+
+
+
+For debugging purposes 
+
+1. gdb ./program
+
+2. run
+
+3. info registers
+
