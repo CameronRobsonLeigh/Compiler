@@ -31,11 +31,16 @@ std::string readFile(const std::string& filename) {
 std::vector<Token> tokenize(const std::string& sourceCode) {
     std::vector<Token> tokens;
 
+    std::string operators = "+-*/";
+
     // Tokenize based on simple rules (e.g., split by space, detect keywords)
     std::istringstream stream(sourceCode);
     std::string word;
     while (stream >> word) {
-        if (word == "return") {
+        if (operators.find(word) != std::string::npos) {
+            tokens.push_back({"OPERATOR", word});
+        } 
+        else if (word == "return") {
             tokens.push_back({"KEYWORD", "return"});
         } else {
             tokens.push_back({"NUMBER", word});
@@ -58,7 +63,39 @@ int parseTokens(const std::vector<Token>& tokens) {
     }
 
     // Convert the second token's value to an integer
-    return std::stoi(tokens[1].value);
+    int result = std::stoi(tokens[1].value);
+
+    for (size_t i = 2; i < tokens.size(); i++) {
+        if (tokens[i].type == "OPERATOR") {
+            char op = tokens[i].value[0];
+            if (i + 1 < tokens.size() && tokens[i + 1].type == "NUMBER") {
+                int number = std::stoi(tokens[i + 1].value);
+                switch (op) {
+                    case '+':
+                        result += number;
+                        break;
+                    case '-':
+                        result -= number;
+                        break;
+                    case '*':
+                        result *= number;
+                        break;
+                    case '/':
+                        result /= number;
+                        break;
+                    default:
+                        std::cerr << "Unknown operator: " << op << '\n';
+                        return 0;
+                }
+                i++; // Skip the next number since it has been processed
+            } else {
+                std::cerr << "Invalid syntax.\n";
+                return 0;
+            }
+        }
+    }
+
+    return result;
 }
 
 // Function to generate assembly code from the parsed return value
@@ -93,6 +130,12 @@ int main() {
 
     // Step 2: Tokenize the source code
     std::vector<Token> tokens = tokenize(sourceCode);
+
+    // Print all tokens
+    std::cout << "Tokens:\n";
+    for (const Token& token : tokens) {
+        std::cout << "Type: " << token.type << ", Value: " << token.value << std::endl;
+    }
 
     // Step 3: Parse the tokens to extract the return value
     int returnValue = parseTokens(tokens);
